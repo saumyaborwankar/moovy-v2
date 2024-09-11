@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { SignUpSchema } from "../types";
-import { signUp } from "../actions/auth.actions";
+import { resendVerificationEmail, signUp } from "../actions/auth.actions";
 import { useRouter } from "next/navigation";
 import { toast } from "./ui/use-toast";
 import {
@@ -18,33 +18,51 @@ import {
 } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { useEffect, useState } from "react";
+import { useCountdown } from "usehooks-ts";
+import { message } from "antd";
 
 export function SignUpForm() {
+  const [showResendVerification, setShowResendVerification] =
+    useState<boolean>(false);
+  const [intervalValue, setIntervalValue] = useState<number>(1000);
+  const [count, { startCountdown, stopCountdown, resetCountdown }] =
+    useCountdown({
+      countStart: 60,
+      intervalMs: intervalValue,
+    });
   const router = useRouter();
-
+  useEffect(() => {
+    if (count === 0) {
+      stopCountdown();
+      resetCountdown();
+    }
+  }, [count]);
   const form = useForm<z.infer<typeof SignUpSchema>>({
     resolver: zodResolver(SignUpSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
       confirmPassword: "",
     },
   });
+  const handleResendVerificationEmail = async () => {
+    const res = await resendVerificationEmail(form.getValues("email"));
+    if (res.error) {
+      message.error(res.error);
+    } else if (res.success) {
+      message.success(res.success);
+      startCountdown();
+    }
+  };
 
   async function onSubmit(values: z.infer<typeof SignUpSchema>) {
     const res = await signUp(values);
+    startCountdown();
     if (res.error) {
-      toast({
-        variant: "destructive",
-        description: res.error,
-      });
+      message.error(res.error);
     } else if (res.success) {
-      toast({
-        variant: "default",
-        description: "Account created successfully",
-      });
-
-      router.push("/");
+      message.success("Account created verification link sent");
     }
   }
   return (
@@ -52,10 +70,10 @@ export function SignUpForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
         <FormField
           control={form.control}
-          name="username"
+          name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input placeholder="shadcn" {...field} />
               </FormControl>
@@ -91,6 +109,16 @@ export function SignUpForm() {
         />
         <Button type="submit">Submit</Button>
       </form>
+      {showResendVerification && (
+        <Button
+          variant="link"
+          onClick={handleResendVerificationEmail}
+          disabled={count > 0 && count < 60}
+        >
+          Send Verification Email
+        </Button>
+      )}
+      {JSON.stringify(count)}
     </Form>
   );
 }

@@ -1,12 +1,13 @@
 import { SignUpForm } from "@/app/components/SignUpForm";
+import { validateRequest } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 export default async function SignUpPage() {
-  // const { user } = await validateRequest()
+  const { user } = await validateRequest();
 
-  // if (user) {
-  //   return redirect("/")
-  // }
+  if (user) {
+    return redirect("/");
+  }
 
   return (
     <div className="pt:mt-0 mx-auto flex flex-col items-center justify-center px-6 pt-8 dark:bg-gray-900 md:h-screen">
