@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:init": "docker run -d --name postgresdb -e POSTGRES_PASSWORD=admin -p 5432:5432 postgres"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
