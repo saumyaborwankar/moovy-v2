@@ -1,5 +1,3 @@
-// import { SignInForm } from "@/components/SignInForm"
-// import { validateRequest } from "@/lib/lucia"
 import { SignInForm } from "@/app/components/SignInForm";
 import { validateRequest } from "@/lib/auth";
 import { redirect } from "next/navigation";
