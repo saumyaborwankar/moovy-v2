@@ -75,8 +75,6 @@ export const resendVerificationEmail = async (email: string) => {
 };
 
 export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
-  console.log(values);
-
   const hashedPassword = await argon2.hash(values.password);
   const userId = generateId(15);
 
@@ -85,6 +83,8 @@ export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
       .insert(userTable)
       .values({
         id: userId,
+        firstName: values.firstName,
+        lastName: values.lastName,
         email: values.email,
         hashedPassword,
       })

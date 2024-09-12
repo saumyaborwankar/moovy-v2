@@ -1,7 +1,7 @@
 import { validateRequest } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { signOut } from "./actions/auth.actions";
-import { Button } from "./components/ui/button";
+import { Button } from "antd";
 
 export default async function Home() {
   const { user } = await validateRequest();
@@ -13,7 +13,7 @@ export default async function Home() {
       <p>Protected route</p>
       <p>{JSON.stringify(user)}</p>
       <form action={signOut}>
-        <Button type="submit">Sign out</Button>
+        <Button type="primary">Sign out</Button>
       </form>
     </main>
   );

@@ -1,8 +1,15 @@
-import { boolean } from "drizzle-orm/pg-core";
-import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  integer,
+} from "drizzle-orm/pg-core";
 
 export const userTable = pgTable("user", {
   id: text("id").primaryKey(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name"),
   email: text("email").notNull().unique(),
   hashedPassword: text("hashedPassword"),
   googleId: text("googleId").unique(),

@@ -1,5 +1,6 @@
 import { FileTextOutlined } from "@ant-design/icons";
 import { Note } from "@saumyaborwankar/thera-notes-api";
+import React from "react";
 import { useState } from "react";
 interface Props {
   note: Note;
