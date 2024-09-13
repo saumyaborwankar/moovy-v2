@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 import { lucia, validateRequest } from "@/lib/auth";
 import db from "@/lib/db";
 import { emailVerificationTable, userTable } from "@/lib/db/schema";
-import * as argon2 from "argon2";
+// import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { generateCodeVerifier, generateState } from "arctic";
 import { facebook, google } from "@/lib/oauth";
@@ -87,7 +87,8 @@ export const resendVerificationEmail = async (email: string) => {
 };
 
 export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
-  const hashedPassword = await argon2.hash(values.password);
+  // const hashedPassword = await argon2.hash(values.password);
+  const hashedPassword = values.password;
   const userId = generateId(15);
 
   try {
@@ -169,11 +170,11 @@ export const signIn = async (values: z.infer<typeof SignInSchema>) => {
     };
   }
 
-  const isValidPassword = await argon2.verify(
-    existingUser.hashedPassword,
-    values.password
-  );
-  // const isValidPassword = existingUser.hashedPassword === values.password;
+  // const isValidPassword = await argon2.verify(
+  //   existingUser.hashedPassword,
+  //   values.password
+  // );
+  const isValidPassword = existingUser.hashedPassword === values.password;
 
   if (!isValidPassword) {
     return {
