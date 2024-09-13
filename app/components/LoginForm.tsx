@@ -7,38 +7,48 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useCountdown } from "usehooks-ts";
 import z from "zod";
-import { resendVerificationEmail, signIn } from "../actions/auth.actions";
+import {
+  createFacebookAuthorizationUrl,
+  createGoogleAuthorizationUrl,
+  resendVerificationEmail,
+  signIn,
+} from "../actions/auth.actions";
 import TheraNotesLogo from "../assets/png/TN.png";
 import TheraNotesFullLogo from "../assets/png/logo-no-background.png";
 import BackgroundImage from "../assets/png/womanWithQuote.png";
 import DividerWithText from "./atoms/DividerWithText";
 import { Icons } from "./atoms/Icons";
 import { PRIMARY_COLOR } from "./atoms/constants";
-
+import { FaFacebookF } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
+import { useGetProductByNameQuery } from "../redux/slice/api";
 interface formDetail {
   email: string;
   password: string;
 }
 
 export function LoginForm() {
+  const { useBreakpoint } = Grid;
+  const screens = useBreakpoint();
+  const router = useRouter();
+
   const [showResendVerification, setShowResendVerification] =
     useState<boolean>(false);
-
   const [intervalValue, setIntervalValue] = useState<number>(1000);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [api, contextHolder] = notification.useNotification();
   const [count, { startCountdown, stopCountdown, resetCountdown }] =
     useCountdown({
       countStart: 60,
       intervalMs: intervalValue,
     });
-  const router = useRouter();
+
   const PasswordSchema = z.object({
     password: z.string(),
     email: z.string().email({ message: "Email not valid" }),
   });
   const rule = createSchemaFieldRule(PasswordSchema);
-  const [api, contextHolder] = notification.useNotification();
-  const { useBreakpoint } = Grid;
-  const screens = useBreakpoint();
+
   const handleResendVerificationEmail = async () => {
     const res = await resendVerificationEmail("");
     if (res.error) {
@@ -48,7 +58,9 @@ export function LoginForm() {
       startCountdown();
     }
   };
+
   const handleLogin = async (data: formDetail) => {
+    setLoading(true);
     const res = await signIn(data);
     if (res.error) {
       if (res?.key === "email_not_verified") {
@@ -60,7 +72,52 @@ export function LoginForm() {
 
       router.push("/");
     }
+    setLoading(false);
   };
+
+  const handleGoogleLogin = async () => {
+    const res = await createGoogleAuthorizationUrl();
+    if (res.success) {
+      window.location.href = res.data.toString();
+    } else if (res.error) {
+      message.error(res.error);
+    }
+  };
+  const handleFacebookLogin = async () => {
+    const res = await createFacebookAuthorizationUrl();
+    if (res.success) {
+      window.location.href = res.data.toString();
+    } else if (res.error) {
+      message.error(res.error);
+    }
+  };
+
+  const GoogleButton = () => {
+    return (
+      <Button
+        block
+        style={{ height: "36px", fontSize: "16px", marginRight: "10px" }}
+        icon={<FaGoogle className="mr-2 h-4 w-4" />}
+        onClick={handleGoogleLogin}
+      >
+        {screens.xs ? "" : "Sign in with Google"}
+      </Button>
+    );
+  };
+
+  const FacebookeButton = () => {
+    return (
+      <Button
+        block
+        style={{ height: "36px", fontSize: "16px" }}
+        icon={<FaFacebookF className="mr-2 h-4 w-4" />}
+        onClick={handleFacebookLogin}
+      >
+        {screens.xs ? "" : "Sign in with Facebook"}
+      </Button>
+    );
+  };
+
   const LoginForm = () => {
     return (
       <div className="h-full w-full mt-10 overflow-hidden">
@@ -84,39 +141,15 @@ export function LoginForm() {
         <div className="w-1/2 m-auto">
           {screens.xs || !screens.md || !screens.xl || !screens.xxl ? (
             <div className="flex-col justify-between w-full mb-5">
-              <Button
-                block
-                style={{ height: "36px", fontSize: "16px" }}
-                icon={<Icons.google className="mr-2 h-4 w-4" />}
-              >
-                {screens.xs ? "" : "Sign in with Google"}
-              </Button>
+              {GoogleButton()}
               <div className="h-2"> </div>
-              <Button
-                block
-                style={{ height: "36px", fontSize: "16px" }}
-                icon={<Icons.apple className="mr-2 h-4 w-4" />}
-              >
-                {screens.xs ? "" : "Sign in with Apple"}
-              </Button>
+              {FacebookeButton()}
             </div>
           ) : (
             <div className="flex justify-between w-full mb-5">
-              <Button
-                block
-                style={{ height: "36px", fontSize: "16px" }}
-                icon={<Icons.google className="mr-2 h-4 w-4" />}
-              >
-                {screens.xs ? "" : "Sign in with Google"}
-              </Button>
+              {GoogleButton()}
               <div className="w-6"> </div>
-              <Button
-                block
-                style={{ height: "36px", fontSize: "16px" }}
-                icon={<Icons.apple className="mr-2 h-4 w-4" />}
-              >
-                {screens.xs ? "" : "Sign in with Apple"}
-              </Button>
+              {FacebookeButton()}
             </div>
           )}
 
@@ -158,6 +191,7 @@ export function LoginForm() {
               <a>Forgot password?</a>
               <Form.Item style={{ width: "40%" }}>
                 <Button
+                  loading={loading}
                   block
                   type="primary"
                   htmlType="submit"
@@ -186,6 +220,7 @@ export function LoginForm() {
       </div>
     );
   };
+
   return screens.lg ? (
     <div className="flex h-screen overflow-hidden">
       <Image

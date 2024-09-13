@@ -10,6 +10,10 @@ import db from "@/lib/db";
 import { emailVerificationTable, userTable } from "@/lib/db/schema";
 import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
+import { generateCodeVerifier, generateState } from "arctic";
+import { facebook, google } from "@/lib/oauth";
+import { VerificationTemplate } from "@/lib/email";
+import { transporter } from "@/lib/email";
 
 export const resendVerificationEmail = async (email: string) => {
   try {
@@ -64,6 +68,14 @@ export const resendVerificationEmail = async (email: string) => {
 
     const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/verify-email?token=${token}`;
 
+    await transporter.sendMail({
+      from: process.env.MAIL_USER!,
+      to: existingUser.email,
+      replyTo: process.env.MAIL_USER!,
+      subject: `Email verification from Thera Notes`,
+      html: VerificationTemplate(url),
+    });
+
     return {
       success: "Email sent",
     };
@@ -83,8 +95,7 @@ export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
       .insert(userTable)
       .values({
         id: userId,
-        firstName: values.firstName,
-        lastName: values.lastName,
+        name: values.firstName + values.lastName,
         email: values.email,
         hashedPassword,
       })
@@ -94,13 +105,14 @@ export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
       });
 
     const verificationCode = Math.random().toString(36).substring(2, 8);
+
     await db.insert(emailVerificationTable).values({
       code: verificationCode,
       userId,
       id: generateId(15),
       sentAt: new Date(),
     });
-    console.log(process.env.JWT_SECRET);
+
     const token = jwt.sign(
       { email: values.email, userId, verificationCode },
       process.env.JWT_SECRET!,
@@ -109,19 +121,14 @@ export const signUp = async (values: z.infer<typeof SignUpSchema>) => {
       }
     );
     const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/verify-email?token=${token}`;
-    console.log(url);
 
-    // const session = await lucia.createSession(userId, {
-    //   expiresIn: 60 * 60 * 24 * 30,
-    // });
-
-    // const sessionCookie = lucia.createSessionCookie(session.id);
-
-    // cookies().set(
-    //   sessionCookie.name,
-    //   sessionCookie.value,
-    //   sessionCookie.attributes
-    // );
+    await transporter.sendMail({
+      from: process.env.MAIL_USER!,
+      to: values.email,
+      replyTo: process.env.MAIL_USER!,
+      subject: `Email verification from Thera Notes`,
+      html: VerificationTemplate(url),
+    });
 
     return {
       success: true,
@@ -219,6 +226,66 @@ export const signOut = async () => {
   } catch (error: any) {
     return {
       error: error?.message,
+    };
+  }
+};
+
+export const createGoogleAuthorizationUrl = async () => {
+  try {
+    const state = generateState();
+    const codeVerifier = generateCodeVerifier();
+    const url = await google.createAuthorizationURL(state, codeVerifier, {
+      scopes: ["profile", "email"],
+    });
+
+    cookies().set("codeVerifier", codeVerifier, {
+      httpOnly: true,
+      // secure: process.env.NODE_ENV === "production",
+      // sameSite: "strict",
+    });
+
+    cookies().set("state", state, {
+      httpOnly: true,
+      // secure: process.env.NODE_ENV === "production",
+      // sameSite: "strict",
+    });
+    return {
+      success: true,
+      data: url.toString(),
+    };
+  } catch (e: any) {
+    return {
+      error: e?.message,
+    };
+  }
+};
+
+export const createFacebookAuthorizationUrl = async () => {
+  try {
+    const state = generateState();
+    // const codeVerifier = generateCodeVerifier();
+    const url = await facebook.createAuthorizationURL(state, {
+      scopes: ["public_profile", "email"],
+    });
+
+    // cookies().set("codeVerifier", codeVerifier, {
+    //   httpOnly: true,
+    // secure: process.env.NODE_ENV === "production",
+    // sameSite: "strict",
+    // });
+
+    cookies().set("state", state, {
+      httpOnly: true,
+      // secure: process.env.NODE_ENV === "production",
+      // sameSite: "strict",
+    });
+    return {
+      success: true,
+      data: url.toString(),
+    };
+  } catch (e: any) {
+    return {
+      error: e?.message,
     };
   }
 };

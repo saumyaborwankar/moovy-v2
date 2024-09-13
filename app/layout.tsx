@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-
+import { AntdRegistry } from "@ant-design/nextjs-registry";
+import { ConfigProvider } from "antd";
+import { ReduxProvider } from "./redux/provider/ReduxProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -16,7 +18,52 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <AntdRegistry>
+          <ConfigProvider
+            theme={{
+              token: {
+                fontFamily: "Geist",
+                motionDurationMid: "0.0s",
+                motionEaseInOut: "0s",
+                colorPrimary: "#9e3164",
+              },
+              components: {
+                Table: {
+                  // rowSelectedBg: FIRST_GRADIENT,
+                  // rowSelectedHoverBg: SECOND_GRADIENT,
+                },
+                // Menu: {
+                //   itemHoverColor: FIRST_GRADIENT,
+                //   itemSelectedBg: FIRST_GRADIENT,
+                //   itemSelectedColor: "white",
+                //   darkItemBg: "white",
+                // },
+                // Layout: {
+                //   siderBg: "white",
+                // },
+
+                Menu: {
+                  itemHoverColor: "white",
+                  itemColor: "white",
+                  itemSelectedBg: "white",
+                  itemSelectedColor: "black",
+                  iconSize: 18,
+                  collapsedIconSize: 18,
+                  fontSize: 14,
+                },
+                Layout: {
+                  siderBg: "white",
+                  triggerBg: "black",
+                  triggerColor: "black",
+                },
+              },
+            }}
+          >
+            <ReduxProvider>{children}</ReduxProvider>
+          </ConfigProvider>
+        </AntdRegistry>
+      </body>
     </html>
   );
 }

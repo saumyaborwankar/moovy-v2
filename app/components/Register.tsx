@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import { useCountdown } from "usehooks-ts";
 import z from "zod";
 import {
+  createFacebookAuthorizationUrl,
+  createGoogleAuthorizationUrl,
   resendVerificationEmail,
   signIn,
   signUp,
@@ -20,6 +22,7 @@ import { Icons } from "./atoms/Icons";
 import { PRIMARY_COLOR } from "./atoms/constants";
 import React from "react";
 import { BlockButton } from "./atoms/BlockButton";
+import { FaFacebookF, FaGoogle } from "react-icons/fa";
 interface formDetail {
   firstName: string;
   lastName: string;
@@ -82,7 +85,47 @@ export function Register() {
   const rule = createSchemaFieldRule(PasswordSchema);
   const { useBreakpoint } = Grid;
   const screens = useBreakpoint();
+  const handleGoogleLogin = async () => {
+    const res = await createGoogleAuthorizationUrl();
+    if (res.success) {
+      window.location.href = res.data.toString();
+    } else if (res.error) {
+      message.error(res.error);
+    }
+  };
+  const handleFacebookLogin = async () => {
+    const res = await createFacebookAuthorizationUrl();
+    if (res.success) {
+      window.location.href = res.data.toString();
+    } else if (res.error) {
+      message.error(res.error);
+    }
+  };
+  const GoogleButton = () => {
+    return (
+      <Button
+        block
+        style={{ height: "36px", fontSize: "16px", marginRight: "10px" }}
+        icon={<FaGoogle className="mr-2 h-4 w-4" />}
+        onClick={handleGoogleLogin}
+      >
+        {screens.xs ? "" : "Sign up with Google"}
+      </Button>
+    );
+  };
 
+  const FacebookButton = () => {
+    return (
+      <Button
+        block
+        style={{ height: "36px", fontSize: "16px" }}
+        icon={<FaFacebookF className="mr-2 h-4 w-4" />}
+        onClick={handleFacebookLogin}
+      >
+        {screens.xs ? "" : "Sign up with Facebook"}
+      </Button>
+    );
+  };
   const RegisterForm = () => {
     return (
       <div className="h-full w-full mt-10 overflow-hidden">
@@ -106,23 +149,15 @@ export function Register() {
         <div className="w-1/2 m-auto">
           {screens.xs || !screens.md || !screens.xl || !screens.xxl ? (
             <div className="flex-col justify-between w-full mb-5">
-              <BlockButton icon={<Icons.google className="mr-2 h-4 w-4" />}>
-                {screens.xs ? "" : "Sign in with Google"}
-              </BlockButton>
+              {GoogleButton()}
               <div className="h-2"> </div>
-              <BlockButton icon={<Icons.apple className="mr-2 h-4 w-4" />}>
-                {screens.xs ? "" : "Sign in with Apple"}
-              </BlockButton>
+              {FacebookButton()}
             </div>
           ) : (
             <div className="flex justify-between w-full mb-5">
-              <BlockButton icon={<Icons.google className="mr-2 h-4 w-4" />}>
-                {screens.xs ? "" : "Sign in with Google"}
-              </BlockButton>
+              {GoogleButton()}
               <div className="w-6"> </div>
-              <BlockButton icon={<Icons.apple className="mr-2 h-4 w-4" />}>
-                {screens.xs ? "" : "Sign in with Apple"}
-              </BlockButton>
+              {FacebookButton()}
             </div>
           )}
 
