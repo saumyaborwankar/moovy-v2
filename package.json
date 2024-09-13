@@ -21,6 +21,7 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
     "@reduxjs/toolkit": "^2.2.7",
+    "@saumyaborwankar/thera-notes-api": "^0.0.8",
     "@types/nodemailer": "^6.4.15",
     "antd": "^5.20.6",
     "antd-zod": "^5.20.5",
