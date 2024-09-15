@@ -9,7 +9,10 @@
     "lint": "next lint",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:init": "docker run -d -e POSTGRES_PASSWORD=admin -p 5432:5432 postgres"
+    "db:init": "docker rm -f thera-notes-db && docker run --name thera-notes-db -d -e POSTGRES_PASSWORD=admin -p 5432:5432 postgres",
+    "db:up": "docker start thera-notes-db",
+    "db:down": "docker stop thera-notes-db",
+    "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.1",
