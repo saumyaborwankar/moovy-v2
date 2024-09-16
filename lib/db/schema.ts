@@ -46,3 +46,39 @@ export const sessionTable = pgTable("session", {
     mode: "date",
   }).notNull(),
 });
+
+export const clientTable = pgTable("client", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => userTable.id),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name"),
+  email: text("email").unique(),
+  phoneNumber: text("phone_number"),
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+    mode: "date",
+  }).default(new Date()),
+  age: integer("age").notNull(),
+  address: text("address"),
+});
+
+export const noteTable = pgTable("note", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => userTable.id),
+  clientId: text("client_id")
+    .notNull()
+    .references(() => clientTable.id),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+    mode: "date",
+  }).default(new Date()),
+  updatedAt: timestamp("updated_at", {
+    withTimezone: true,
+    mode: "date",
+  }).default(new Date()),
+});
