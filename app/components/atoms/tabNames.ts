@@ -6,4 +6,5 @@ export const TAB_NAMES = {
   profile: "profile",
   clients: "clients",
   verifyEmail: "verify",
+  notes: "notes",
 };

@@ -1,13 +1,14 @@
+import { Client } from "@/lib/db/schema";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Client } from "@saumyaborwankar/thera-notes-api";
+
 const clients = [
   {
     id: "2",
     userId: "userId1",
     firstName: "Client",
     lastName: "Number 2",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
     email: "thesaumyaborwankar@gmail.com",
     phoneNumber: "+91 8488897431",
     age: 25,

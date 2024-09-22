@@ -1,4 +1,9 @@
 import {
+  InferModelFromColumns,
+  InferSelectModel,
+  relations,
+} from "drizzle-orm";
+import {
   pgTable,
   text,
   timestamp,
@@ -54,7 +59,7 @@ export const clientTable = pgTable("client", {
     .references(() => userTable.id),
   firstName: text("first_name").notNull(),
   lastName: text("last_name"),
-  email: text("email").unique(),
+  email: text("email").unique().notNull(),
   phoneNumber: text("phone_number"),
   createdAt: timestamp("created_at", {
     withTimezone: true,
@@ -63,6 +68,10 @@ export const clientTable = pgTable("client", {
   age: integer("age").notNull(),
   address: text("address"),
 });
+export const clientRelations = relations(clientTable, ({ many }) => ({
+  notes: many(noteTable),
+}));
+export type Client = InferSelectModel<typeof clientTable>;
 
 export const noteTable = pgTable("note", {
   id: text("id").primaryKey(),
@@ -82,3 +91,11 @@ export const noteTable = pgTable("note", {
     mode: "date",
   }).default(new Date()),
 });
+
+export type Note = InferSelectModel<typeof noteTable>;
+export const noteRelations = relations(noteTable, ({ one }) => ({
+  client: one(clientTable, {
+    fields: [noteTable.clientId],
+    references: [clientTable.id],
+  }),
+}));

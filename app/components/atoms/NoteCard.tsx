@@ -1,5 +1,5 @@
+import { Note } from "@/lib/db/schema";
 import { FileTextOutlined } from "@ant-design/icons";
-import { Note } from "@saumyaborwankar/thera-notes-api";
 import React from "react";
 import { useState } from "react";
 interface Props {
@@ -76,7 +76,7 @@ export const NoteCard = (props: Props) => {
           />
 
           <div className="text-center pb-2">
-            {formatDate(new Date(props.note.createdAt))}
+            {formatDate(new Date(props.note.createdAt!))}
           </div>
         </div>
       </div>

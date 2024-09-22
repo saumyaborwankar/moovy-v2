@@ -1,4 +1,4 @@
-import { validateRequest } from "@/lib/auth";
+// import { validateRequest } from "@/lib/auth";
 import db from "@/lib/db";
 import { clientTable } from "@/lib/db/schema";
 import {
@@ -16,25 +16,7 @@ export const productsAPI = createApi({
     getProductByName: builder.query({
       query: () => `users`,
     }),
-    getClients: builder.query<any, void>({
-      async queryFn() {
-        try {
-          const user = await validateRequest();
-          if (user) {
-            const userId = user.user?.id!;
-            const clients = await db.query.clientTable.findMany({
-              where: eq(clientTable.userId, userId),
-            });
-            return { data: clients };
-          }
-          return { error: "Not authorized" };
-        } catch (error) {
-          console.log(error);
-          return { error };
-        }
-      },
-    }),
   }),
 });
 
-export const { useGetProductByNameQuery, useGetClientsQuery } = productsAPI;
+export const { useGetProductByNameQuery } = productsAPI;

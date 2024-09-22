@@ -14,7 +14,7 @@ import {
   Typography,
 } from "antd";
 import { Footer } from "antd/es/layout/layout";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { HiUsers } from "react-icons/hi";
 import { MdOutlineArrowBackIosNew } from "react-icons/md";
@@ -22,6 +22,9 @@ import { FIRST_GRADIENT } from "../atoms/constants";
 import { TAB_NAMES } from "../atoms/tabNames";
 import { redirect } from "next/dist/server/api-utils";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { setUserDetails } from "@/app/redux/slice/userSlice";
+import { signOut } from "@/app/actions/auth.actions";
 
 const contentPadding = 0;
 const siderWidth = 200 + contentPadding;
@@ -66,10 +69,18 @@ const siderItems: MenuProps["items"] = [
   // },
 ];
 export default function AppLayout({
+  user,
   children,
 }: Readonly<{
   children: React.ReactNode;
+  user: { id: string };
 }>) {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (user && user.id) {
+      dispatch(setUserDetails(user.id));
+    }
+  }, [user]);
   const router = useRouter();
   const onClick: MenuProps["onClick"] = (e) => {
     console.log(e.key);
@@ -109,8 +120,9 @@ export default function AppLayout({
       key: "2",
       label: (
         <a
-          onClick={() => {
+          onClick={async () => {
             //signout
+            await signOut();
           }}
         >
           Sign Out{" "}
@@ -139,11 +151,11 @@ export default function AppLayout({
         <Sider
           trigger={null}
           collapsible
-          breakpoint="lg"
+          // breakpoint="lg"
           collapsedWidth="80"
-          onBreakpoint={(broken) => {
-            setCollapsed(true);
-          }}
+          // onBreakpoint={(broken) => {
+          //   setCollapsed(true);
+          // }}
           collapsed={collapsed}
           style={{
             overflow: "hidden",

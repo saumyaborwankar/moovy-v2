@@ -1,18 +1,23 @@
 import { signOut } from "@/app/actions/auth.actions";
 import { TAB_NAMES } from "@/app/components/atoms/tabNames";
 import AppLayout from "@/app/components/pages/AppLayout";
+import { setUserDetails } from "@/app/redux/slice/userSlice";
 import { validateRequest } from "@/lib/auth";
 import { Button } from "antd";
 import { redirect } from "next/navigation";
+// import { useDispatch } from "react-redux";
 
 export default async function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // const dispatch = useDispatch();
   const { user } = await validateRequest();
   if (!user) {
     redirect(`/${TAB_NAMES.signIn}`);
+  } else {
+    // dispatch(setUserDetails(user.id));
   }
   const handleSignOut = async () => {
     "use server";
@@ -32,6 +37,6 @@ export default async function DashboardLayout({
     //   </form> */}
     //   {children}
     // </main>
-    <AppLayout>{children}</AppLayout>
+    <AppLayout user={user}>{children}</AppLayout>
   );
 }
