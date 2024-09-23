@@ -151,6 +151,7 @@ export default function AppLayout({
         <Sider
           trigger={null}
           collapsible
+          defaultValue={"clients"}
           // breakpoint="lg"
           collapsedWidth="80"
           // onBreakpoint={(broken) => {

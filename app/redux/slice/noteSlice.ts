@@ -60,6 +60,7 @@ const noteSlice = createSlice({
     setCurrentNote: (state, action: PayloadAction<Note>) => {
       state.currentNote = action.payload;
       state.selectedNote = true;
+      state.newNote = false;
     },
     setNewNote: (state, action: PayloadAction<boolean>) => {
       state.newNote = action.payload;

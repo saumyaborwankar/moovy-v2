@@ -14,7 +14,7 @@ export default async function Home() {
     await signOut();
     // return redirect("/sign-in"); // Redirect after sign-out
   };
-  redirect(`/${TAB_NAMES.dashboard}`);
+  redirect(`/${TAB_NAMES.dashboard}/${TAB_NAMES.clients}`);
   // return (
   //   <main className="flex min-h-screen flex-col items-center justify-between p-24">
   //     <p>Protected route</p>

@@ -4,7 +4,9 @@ import { twMerge } from "tailwind-merge";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-
+// export function returnResponse(success:string,error:string,status:number){
+// return Response.json(success ? {success:true})
+// }
 export function formatDate(date: Date) {
   const monthNames = [
     "Jan",

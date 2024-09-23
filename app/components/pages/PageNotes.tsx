@@ -59,7 +59,7 @@ export const PageNotes = ({ currentClient }: Props) => {
           style={{
             padding: 24,
             width: "30vw",
-            height: "40vh",
+            height: "45vh",
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
           }}
@@ -127,7 +127,7 @@ export const PageNotes = ({ currentClient }: Props) => {
         </div>
       )}
       {(newNote || selectedNote) && (
-        <div className="w-full h-[40vh]">
+        <div className="w-full h-[40vh] pr-10">
           <NoteEditor client={currentClient} />
         </div>
       )}

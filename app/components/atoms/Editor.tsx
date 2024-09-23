@@ -92,6 +92,7 @@ import { useDispatch } from "react-redux";
 import { setNewNote } from "@/app/redux/slice/noteSlice";
 import { MdDelete, MdDeleteOutline } from "react-icons/md";
 import { formatDate, formatTime } from "@/lib/utils";
+import { PRIMARY_COLOR } from "./constants";
 export function NoteEditor({ client }: { client: Client }) {
   // const router = useRouter()
   const dispatch = useDispatch();
@@ -211,12 +212,17 @@ export function NoteEditor({ client }: { client: Client }) {
       <div className="text-right">
         <Button
           size="large"
-          type="link"
+          type="primary"
+          style={{
+            background: "transparent",
+            color: PRIMARY_COLOR,
+            outline: "none",
+            outlineColor: "transparent",
+            boxShadow: "none",
+          }}
           onClick={() => dispatch(setNewNote(false))}
           icon={<IoMdClose style={{ fontSize: 20 }} />}
-        >
-          {/* Close */}
-        </Button>
+        ></Button>
       </div>
       <RichTextEditor
         value={value}
@@ -224,9 +230,13 @@ export function NoteEditor({ client }: { client: Client }) {
         editorStyle={{ height: "50vh" }}
       />
       {/* <div style={{ textAlign: "right", marginTop: 10 }}> */}
-      <div className="flex justify-between mt-6 text-slate-500 align-middle">
+      <div
+        className={
+          selectedNote ? "flex justify-between mt-3 " : "mt-3 text-right"
+        }
+      >
         {selectedNote && (
-          <div>
+          <div className="text-slate-500 align-middle">
             Last updated on: {formatDate(currentNote.updatedAt!)}{" "}
             {/* {currentNote.updatedAt?.getFullYear().toString().substring(2)} */}
             {currentNote.updatedAt?.getFullYear()}
@@ -234,7 +244,7 @@ export function NoteEditor({ client }: { client: Client }) {
             {formatTime(currentNote.updatedAt!)}
           </div>
         )}
-        <Space>
+        <Space style={{ textAlign: "right" }}>
           {selectedNote && (
             <Popconfirm
               title="Are you sure you want to delete this note?"

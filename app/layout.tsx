@@ -57,6 +57,10 @@ export default function RootLayout({
                   triggerBg: "black",
                   triggerColor: "black",
                 },
+                Button: {
+                  // groupBorderColor: "#9e3164",
+                  // colorIt
+                },
               },
             }}
           >

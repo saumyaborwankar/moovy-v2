@@ -100,7 +100,7 @@ export function LoginForm() {
         icon={<FaGoogle className="mr-2 h-4 w-4" />}
         onClick={handleGoogleLogin}
       >
-        {screens.xs ? "" : "Sign in with Google"}
+        {screens.xs ? "Google" : "Sign in with Google"}
       </Button>
     );
   };
@@ -113,7 +113,7 @@ export function LoginForm() {
         icon={<FaFacebookF className="mr-2 h-4 w-4" />}
         onClick={handleFacebookLogin}
       >
-        {screens.xs ? "" : "Sign in with Facebook"}
+        {screens.xs ? "Facebook" : "Sign in with Facebook"}
       </Button>
     );
   };

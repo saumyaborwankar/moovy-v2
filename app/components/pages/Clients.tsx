@@ -60,6 +60,7 @@ export default function Clients({ clients }: { clients: Client[] }) {
 
   useEffect(() => {
     if (addClientSuccess) {
+      setNewClient(false);
       message.success("Client added successfully.");
       router.push(`/${TAB_NAMES.dashboard}/${TAB_NAMES.clients}`);
       router.refresh();
@@ -192,7 +193,6 @@ export default function Clients({ clients }: { clients: Client[] }) {
     //   createdAt: new Date(),
     // });
     triggerAddNewClient(data);
-    setNewClient(false);
   }
 
   return (
@@ -273,7 +273,7 @@ export default function Clients({ clients }: { clients: Client[] }) {
             />
           </Form.Item>
           <Form.Item style={{ textAlign: "right" }}>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" loading={addClientLoading}>
               Add Client
             </Button>
           </Form.Item>
