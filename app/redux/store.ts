@@ -6,10 +6,12 @@ import clientSlice from "./slice/clientSlice";
 import userSlice from "./slice/userSlice";
 import { clientApi } from "./slice/clientApi";
 import { notesApi } from "./slice/notesApi";
+import noteSlice from "./slice/noteSlice";
 
 export const store = configureStore({
   reducer: {
     // clients: clientSlice,
+    note: noteSlice,
     user: userSlice,
     [clientApi.reducerPath]: clientApi.reducer,
     [notesApi.reducerPath]: notesApi.reducer,

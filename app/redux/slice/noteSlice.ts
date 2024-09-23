@@ -1,49 +1,24 @@
+import { Note } from "@/lib/db/schema";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Note } from "@saumyaborwankar/thera-notes-api";
-const notes: Note[] = [
-  {
-    id: "note1",
-    userId: "userId1",
-    clientId: "2",
-    content: "note 1 containst stuff",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+interface NoteSlice {
+  currentNote: Note;
+  selectedNote: boolean;
+  newNote: boolean;
+}
+const note: NoteSlice = {
+  currentNote: {
+    id: "",
+    userId: "",
+    createdAt: null,
+    clientId: "",
+    content: "",
+    updatedAt: null,
   },
-  {
-    id: "note2",
-    userId: "userId1",
-    clientId: "2",
-    content: "note 2 also containst stuff",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "note3",
-    userId: "userId1",
-    clientId: "2",
-    content: "note 3 maybe containst stuff",
-    createdAt: new Date("2024-01-15T08:30:00Z").toISOString(),
-    updatedAt: new Date("2024-01-15T08:30:00Z").toISOString(),
-  },
-  {
-    id: "note4",
-    userId: "userId1",
-    clientId: "2",
-    content: "note 4 can containst stuff",
-    createdAt: new Date("2024-01-25T11:00:00Z").toISOString(),
-    updatedAt: new Date("2024-01-25T11:00:00Z").toISOString(),
-  },
-  {
-    id: "note5",
-    userId: "userId1",
-    clientId: "2",
-    content: "note 5 will containst stuff",
-    createdAt: new Date("2024-02-25T16:00:00Z").toISOString(),
-    updatedAt: new Date("2024-02-25T16:00:00Z").toISOString(),
-  },
-];
+  selectedNote: false,
+  newNote: false,
+};
 
-const initialState: Note[] = notes;
+const initialState: NoteSlice = note;
 
 export const NOTE = "NOTE";
 // export const validateAccessToken = createAsyncThunk<UserResponse>(
@@ -75,8 +50,20 @@ const noteSlice = createSlice({
   name: NOTE,
   initialState,
   reducers: {
-    setNotes: (state, action: PayloadAction<Note[]>) => {
-      state = action.payload;
+    // setNoteSlice: (state, action: PayloadAction<NoteSlice>) => {
+    //   if (action.payload.newNote) {
+    //     state.newNote = action.payload.newNote;
+    //     state.currentNote = action.payload.currentNote;
+    //     state.selectedNote = action.payload.selectedNote;
+    //   }
+    // },
+    setCurrentNote: (state, action: PayloadAction<Note>) => {
+      state.currentNote = action.payload;
+      state.selectedNote = true;
+    },
+    setNewNote: (state, action: PayloadAction<boolean>) => {
+      state.newNote = action.payload;
+      state.selectedNote = false;
     },
     // setUserDetails: (state, action: PayloadAction<UserResponse>) => {
     //   state.email = action.payload.email;
@@ -109,6 +96,6 @@ const noteSlice = createSlice({
   //   },
 });
 
-export const { setNotes } = noteSlice.actions;
+export const { setCurrentNote, setNewNote } = noteSlice.actions;
 
 export default noteSlice.reducer;

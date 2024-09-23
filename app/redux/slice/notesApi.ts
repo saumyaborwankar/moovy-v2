@@ -25,10 +25,24 @@ export const notesApi = createApi({
         body: JSON.stringify(deleteNote),
       }),
     }),
+    updateNote: builder.mutation<any, UpdateNote>({
+      query: (updateNote) => ({
+        url: "note",
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updateNote),
+      }),
+    }),
   }),
 });
 
-export const { useAddNoteMutation, useDeleteNoteMutation } = notesApi;
+export const {
+  useAddNoteMutation,
+  useDeleteNoteMutation,
+  useUpdateNoteMutation,
+} = notesApi;
 
 interface NoteDetails {
   userId: string;
@@ -39,4 +53,8 @@ interface NoteDetails {
 interface QueryNote {
   id: string;
   userId: string;
+}
+
+interface UpdateNote extends QueryNote {
+  content: string;
 }

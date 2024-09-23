@@ -1,37 +1,17 @@
+"use client";
+import { setCurrentNote } from "@/app/redux/slice/noteSlice";
 import { Note } from "@/lib/db/schema";
+import { formatDate, formatTime } from "@/lib/utils";
 import { FileTextOutlined } from "@ant-design/icons";
 import React from "react";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 interface Props {
   note: Note;
 }
-function formatDate(date: Date) {
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
 
-  const day = date.getDate();
-  const month = date.getMonth();
-
-  let suffix = "th";
-  if (day % 10 === 1 && day !== 11) suffix = "st";
-  else if (day % 10 === 2 && day !== 12) suffix = "nd";
-  else if (day % 10 === 3 && day !== 13) suffix = "rd";
-
-  return `${day}${suffix} ${monthNames[month]}`;
-}
 export const NoteCard = (props: Props) => {
+  const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [isClicked, setIsClicked] = useState<boolean>(false);
 
@@ -43,6 +23,8 @@ export const NoteCard = (props: Props) => {
   };
   const handleMouseUp = () => {
     setIsClicked(false);
+    console.log("clicked");
+    dispatch(setCurrentNote(props.note));
   };
   const handleMouseLeave = () => {
     setIsHovered(false);
@@ -74,9 +56,13 @@ export const NoteCard = (props: Props) => {
               marginBottom: 5,
             }}
           />
-
-          <div className="text-center pb-2">
-            {formatDate(new Date(props.note.createdAt!))}
+          <div className="flex flex-col">
+            <div className="text-center ">
+              {formatDate(new Date(props.note.createdAt!))}
+            </div>
+            <div className="pb-2">
+              {formatTime(new Date(props.note.createdAt!))}
+            </div>
           </div>
         </div>
       </div>

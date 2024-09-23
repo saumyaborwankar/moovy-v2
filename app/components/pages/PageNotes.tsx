@@ -1,27 +1,31 @@
 "use client";
-import { useAppSelector } from "@/app/redux/hooks";
-import { Button, Modal, theme, Typography } from "antd";
-import { useParams } from "next/navigation";
-import { NoteGrid } from "../molecules/NoteGrid";
+import { Button, theme, Typography } from "antd";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { FiPlus } from "react-icons/fi";
-import { useState } from "react";
 import { NoteEditor } from "../atoms/Editor";
-// import { NoteGrid } from "../molecules/NoteGrid";
-// import { useParams } from "react-router-dom";
-// import { useAppSelector } from "../../store/hooks";
-// import { NoteGrid } from "../molecules/NoteGrid";
+import { NoteGrid } from "../molecules/NoteGrid";
+import { useAppSelector } from "@/app/redux/hooks";
+import { useDispatch } from "react-redux";
+import { setNewNote } from "@/app/redux/slice/noteSlice";
 interface Props {
   currentClient: any;
 }
 export const PageNotes = ({ currentClient }: Props) => {
-  console.log(currentClient);
-  //   const clients = useAppSelector((state) => state.clients);
-  //   const currentClient = clients.find((p) => p.id === clientId);
+  const dispatch = useDispatch();
+  // console.log(currentClient);
+  const router = useRouter();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
-  const [newNote, setNewNote] = useState<boolean>(false);
-
+  const noteSlice = useAppSelector((state) => state.note);
+  const newNote = noteSlice.newNote;
+  const selectedNote = noteSlice.selectedNote;
+  useEffect(() => {
+    if (!newNote || !selectedNote) {
+      router.refresh();
+    }
+  }, [newNote, selectedNote]);
   return (
     <div className="flex min-h-[40vh]">
       {/* ------------------- NOTES -------------------- */}
@@ -38,18 +42,19 @@ export const PageNotes = ({ currentClient }: Props) => {
         <div className="flex justify-between">
           <Typography.Title level={4}>Notes</Typography.Title>
           <Button
+            disabled={newNote}
             type="primary"
             icon={<FiPlus />}
-            onClick={() => setNewNote(true)}
+            onClick={() => dispatch(setNewNote(true))}
           >
             Add note
           </Button>
         </div>
-        <NoteGrid notes={[]} />
+        <NoteGrid notes={currentClient.notes} />
       </div>
 
       {/* ------------------- PROFILE -------------------- */}
-      {!newNote && (
+      {!newNote && !selectedNote && (
         <div
           style={{
             padding: 24,
@@ -66,13 +71,6 @@ export const PageNotes = ({ currentClient }: Props) => {
                 Client Information
               </Typography.Title>
               <div className="bg-white overflow-auto shadow rounded-lg border">
-                {/* <div className="px-4 py-5 sm:px-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">
-              Client Information
-            </h3>
-            <p className="mt-1 max-w-2xl text-sm text-gray-500">
-            </p>
-          </div> */}
                 <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
                   <dl className="sm:divide-y sm:divide-gray-200">
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -128,9 +126,9 @@ export const PageNotes = ({ currentClient }: Props) => {
           </div>
         </div>
       )}
-      {newNote && (
-        <div className="w-full h-[40vh] text-right">
-          <NoteEditor />
+      {(newNote || selectedNote) && (
+        <div className="w-full h-[40vh]">
+          <NoteEditor client={currentClient} />
         </div>
       )}
     </div>
