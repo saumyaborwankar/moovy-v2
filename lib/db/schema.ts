@@ -16,10 +16,14 @@ export const userTable = pgTable("user", {
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   hashedPassword: text("hashedPassword"),
+  occupation: text("occupation").default("Psychologist"),
   googleId: text("googleId").unique(),
   isEmailVerified: boolean("is_email_verified").notNull().default(false),
   profilePictureUrl: text("profile_picture_url"),
+  phonenumber: text("phone_number"),
+  location: text("location"),
 });
+export type User = InferSelectModel<typeof userTable>;
 
 export const oauthAccountTable = pgTable("oauth_account", {
   id: text("id").primaryKey(),
@@ -67,6 +71,7 @@ export const clientTable = pgTable("client", {
   }).default(new Date()),
   age: integer("age").notNull(),
   address: text("address"),
+  isDeleted: boolean("is_deleted").default(false),
 });
 export const clientRelations = relations(clientTable, ({ many }) => ({
   notes: many(noteTable),

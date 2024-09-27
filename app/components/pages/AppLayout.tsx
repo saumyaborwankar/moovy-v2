@@ -1,5 +1,9 @@
 "use client";
-import { BellOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
+import { signOut } from "@/app/actions/auth.actions";
+import { useAppSelector } from "@/app/redux/hooks";
+import { setSearch } from "@/app/redux/slice/searchSlice";
+import { setUserDetails } from "@/app/redux/slice/userSlice";
+import { SearchOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import {
   Avatar,
@@ -11,26 +15,20 @@ import {
   Menu,
   Space,
   theme,
+  Tooltip,
   Typography,
 } from "antd";
 import { Footer } from "antd/es/layout/layout";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { HiUsers } from "react-icons/hi";
 import { MdOutlineArrowBackIosNew } from "react-icons/md";
+import { useDispatch } from "react-redux";
 import { FIRST_GRADIENT } from "../atoms/constants";
 import { TAB_NAMES } from "../atoms/tabNames";
-import { redirect } from "next/dist/server/api-utils";
-import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
-import { setUserDetails } from "@/app/redux/slice/userSlice";
-import { signOut } from "@/app/actions/auth.actions";
+import { GrSchedules } from "react-icons/gr";
 
-const contentPadding = 0;
-const siderWidth = 200 + contentPadding;
-const siderCollapsedWidth = 80 + contentPadding;
-const headerHeight = 65 + contentPadding / 2;
-// const rightSiderWidth: number = showChecklist ? 320 : 0;
 const iconSize = {
   fontSize: "20px",
   width: 40,
@@ -57,11 +55,16 @@ const siderItems: MenuProps["items"] = [
     label: "Clients",
     // onClick: () => navigate("/clients"),
   },
-  // {
-  //   key: "schedule",
-  //   icon: React.createElement(GrSchedules),
-  //   label: "Schedule",
-  // },
+  {
+    key: "schedule",
+    icon: React.createElement(GrSchedules),
+    label: (
+      <Tooltip title="Schedule coming soon" placement="bottom">
+        Schedule
+      </Tooltip>
+    ),
+    disabled: true,
+  },
   // {
   //   key: "notes",
   //   icon: React.createElement(FaRegNoteSticky),
@@ -73,17 +76,26 @@ export default function AppLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-  user: { id: string };
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    profilePictureUrl: string | null;
+    occupation: string | null;
+    phonenumber: string | null;
+    location: string | null;
+  };
 }>) {
   const dispatch = useDispatch();
+
   useEffect(() => {
-    if (user && user.id) {
-      dispatch(setUserDetails(user.id));
+    if (user) {
+      dispatch(setUserDetails(user));
     }
   }, [user]);
+
   const router = useRouter();
   const onClick: MenuProps["onClick"] = (e) => {
-    console.log(e.key);
     switch (e.key) {
       case "clients":
         router.push(`/${TAB_NAMES.dashboard}/${TAB_NAMES.clients}`);
@@ -103,7 +115,7 @@ export default function AppLayout({
       label: (
         <a
           onClick={() => {
-            // navigate(`/${TAB_NAMES.profil/e}`);
+            router.push(`/${TAB_NAMES.dashboard}/${TAB_NAMES.profile}`);
           }}
         >
           Profile
@@ -125,7 +137,7 @@ export default function AppLayout({
             await signOut();
           }}
         >
-          Sign Out{" "}
+          Sign Out
         </a>
       ),
       onMouseEnter: () => {
@@ -144,7 +156,23 @@ export default function AppLayout({
   const { useBreakpoint } = Grid;
   const screens = useBreakpoint();
   const { Header, Content, Sider } = Layout;
-
+  const search = useAppSelector((state) => state.search.search);
+  const onChange = (e: any) => {
+    if (e.target.value != "") {
+      dispatch(setSearch(e.target.value));
+      router.push(`/${TAB_NAMES.dashboard}/${TAB_NAMES.search}`);
+    }
+  };
+  useEffect(() => {
+    if (search != "") {
+      router.push(`/${TAB_NAMES.dashboard}/${TAB_NAMES.search}`);
+    }
+  }, [search]);
+  const contentPadding = 0;
+  const siderWidth = !screens.md ? 0 : 200 + contentPadding;
+  const siderCollapsedWidth = 80 + contentPadding;
+  const headerHeight = 65 + contentPadding / 2;
+  // const rightSiderWidth: number = showChecklist ? 320 : 0;
   return (
     <div className="h-screen w-screen">
       <Layout style={{ width: "100%", height: "100%", overflow: "hidden" }}>
@@ -152,11 +180,11 @@ export default function AppLayout({
           trigger={null}
           collapsible
           defaultValue={"clients"}
-          // breakpoint="lg"
+          breakpoint="md"
           collapsedWidth="80"
-          // onBreakpoint={(broken) => {
-          //   setCollapsed(true);
-          // }}
+          onBreakpoint={(broken) => {
+            setCollapsed(broken);
+          }}
           collapsed={collapsed}
           style={{
             overflow: "hidden",
@@ -167,6 +195,7 @@ export default function AppLayout({
             bottom: 0,
             scrollbarWidth: "thin",
             scrollbarColor: "unset",
+            zIndex: "1000",
           }}
         >
           <div
@@ -237,12 +266,31 @@ export default function AppLayout({
                 "0 3px 6px rgba(36,43,53,.2),0 3px 6px rgba(36,43,53,.2)",
             }}
           >
-            <div className="text-black pl-5 text-xl">Saumya Borwankar</div>
+            <Space>
+              {!screens.md ? (
+                <></>
+              ) : (
+                // <div style={{ paddingLeft: "1em" }}>
+                //   <Button
+                //     type="primary"
+                //     icon={<MenuUnfoldOutlined />}
+                //     onClick={() => setCollapsed(!collapsed)}
+                //   />
+                // </div>
+                <></>
+              )}
+              <div className="text-black pl-5 text-xl">{user.name}</div>
+            </Space>
+
             <Space style={{ marginRight: "20px" }} size={"middle"}>
-              <Input placeholder="Search clients" prefix={<SearchOutlined />} />
-              <div style={{ cursor: "pointer" }}>
+              <Input
+                placeholder="Search clients"
+                prefix={<SearchOutlined />}
+                onChange={onChange}
+              />
+              {/* <div style={{ cursor: "pointer" }}>
                 <Avatar size={40} icon={<BellOutlined />} />
-              </div>
+              </div> */}
 
               <Dropdown
                 trigger={["click"]}
@@ -251,7 +299,11 @@ export default function AppLayout({
                 arrow
               >
                 <div style={{ cursor: "pointer" }}>
-                  <Avatar size={40} icon={<UserOutlined />} />
+                  <Avatar
+                    size={40}
+                    // icon={<UserOutlined />}
+                    src={user?.profilePictureUrl}
+                  />
                 </div>
               </Dropdown>
             </Space>
@@ -260,7 +312,7 @@ export default function AppLayout({
             style={{
               margin: "24px 16px 0",
               paddingLeft: !screens.md
-                ? contentPadding + 10
+                ? siderCollapsedWidth
                 : collapsed
                 ? siderCollapsedWidth
                 : siderWidth,

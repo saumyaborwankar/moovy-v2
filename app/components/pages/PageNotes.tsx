@@ -8,6 +8,7 @@ import { NoteGrid } from "../molecules/NoteGrid";
 import { useAppSelector } from "@/app/redux/hooks";
 import { useDispatch } from "react-redux";
 import { setNewNote } from "@/app/redux/slice/noteSlice";
+import { EditFilled, EditOutlined } from "@ant-design/icons";
 interface Props {
   currentClient: any;
 }
@@ -59,7 +60,7 @@ export const PageNotes = ({ currentClient }: Props) => {
           style={{
             padding: 24,
             width: "30vw",
-            height: "45vh",
+            height: "40vh",
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
           }}
@@ -96,9 +97,11 @@ export const PageNotes = ({ currentClient }: Props) => {
                         Phone number
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {currentClient.phoneNumber
-                          ? currentClient.phoneNumber
-                          : "Add phone number"}
+                        {currentClient.phoneNumber ? (
+                          currentClient.phoneNumber
+                        ) : (
+                          <Button type="link" icon={<EditOutlined />} />
+                        )}
                       </dd>
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -106,9 +109,11 @@ export const PageNotes = ({ currentClient }: Props) => {
                         Address
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {currentClient.address
-                          ? currentClient.address
-                          : "Add address"}
+                        {currentClient.address ? (
+                          currentClient.address
+                        ) : (
+                          <Button type="link" icon={<EditOutlined />} />
+                        )}
                         {/* <br />
                   Anytown, USA 12345 */}
                       </dd>

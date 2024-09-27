@@ -12,9 +12,11 @@
     "db:init": "docker rm -f thera-notes-db && docker run --name thera-notes-db -d -e POSTGRES_PASSWORD=admin -p 5432:5432 postgres",
     "db:up": "docker start thera-notes-db",
     "db:down": "docker stop thera-notes-db",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.5.1",
     "@ant-design/nextjs-registry": "^1.0.1",
     "@aws-sdk/client-rds-data": "^3.649.0",
     "@aws-sdk/credential-providers": "^3.649.0",
@@ -41,6 +43,7 @@
     "next": "14.2.6",
     "nodemailer": "^6.9.15",
     "pg": "^8.12.0",
+    "random-avatar-generator": "^2.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-draft-wysiwyg": "^1.15.0",

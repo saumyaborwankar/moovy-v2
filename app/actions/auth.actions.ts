@@ -204,7 +204,34 @@ export const signIn = async (values: z.infer<typeof SignInSchema>) => {
     success: "Logged in successfully",
   };
 };
-
+export const getUser = async (id: string) => {
+  try {
+    const user = await db.query.userTable.findFirst({
+      where: eq(userTable.id, id),
+    });
+    if (!user) {
+      return {
+        error: "User not found",
+      };
+    }
+    return {
+      success: true,
+      data: {
+        email: user.email,
+        id: user.id,
+        name: user.name,
+        profilePictureUrl: user.profilePictureUrl,
+        occupation: user.occupation,
+        phonenumber: user.phonenumber,
+        location: user.location,
+      },
+    };
+  } catch (error: any) {
+    return {
+      error: error?.message,
+    };
+  }
+};
 export const signOut = async () => {
   try {
     const { session } = await validateRequest();

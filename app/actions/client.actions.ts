@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 export const getClients = async (userId: string) => {
   try {
     const clients = await db.query.clientTable.findMany({
-      where: eq(clientTable.userId, userId),
+      where: eq(clientTable.userId, userId) && eq(clientTable.isDeleted, false),
     });
     return { data: clients, success: true };
   } catch (e) {

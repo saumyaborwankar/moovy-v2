@@ -23,6 +23,12 @@ export default function RootLayout({
           <ConfigProvider
             theme={{
               token: {
+                // colorPrimary: 'rgb(102, 193, 155)',
+                colorTextBase: "#0a2d40",
+                colorSuccess: "#87df98",
+                colorError: "#da1c5c",
+                colorInfo: "#633c9c",
+
                 fontFamily: "Geist",
                 motionDurationMid: "0.0s",
                 motionEaseInOut: "0s",

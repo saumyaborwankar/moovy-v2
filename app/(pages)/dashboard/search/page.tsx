@@ -1,18 +1,19 @@
 import { getClients } from "@/app/actions/client.actions";
 import { TAB_NAMES } from "@/app/components/atoms/tabNames";
-import Clients from "@/app/components/pages/Clients";
+import PageSearch from "@/app/components/pages/PageSearch";
 import { validateRequest } from "@/lib/auth";
-import { message } from "antd";
 import { redirect } from "next/navigation";
 
-export default async function Client() {
+export default async function SearchPage() {
+  let clientData;
   const { user } = await validateRequest();
   if (!user) {
     redirect(`/${TAB_NAMES.signIn}`);
+  } else {
+    const clients = await getClients(user.id);
+    if (clients.success) {
+      clientData = clients.data;
+    }
   }
-
-  const clients = await getClients(user.id);
-  const clientData = clients.success ? clients.data : [];
-
-  if (user && clientData) return <Clients clients={clientData} />;
+  return <PageSearch clientData={clientData} />;
 }

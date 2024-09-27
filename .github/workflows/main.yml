@@ -1,0 +1,34 @@
+name: Generate and Publish NPM Package
+
+on:
+  push:
+    branches:
+      - api-release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Build Docker image
+        run: docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/api/openapi.yaml -g typescript-axios -o /local/api/package --additional-properties=npmName=@saumyaborwankar/thera-notes-api
+
+      - name: change folders
+        run: cd ./api/package && ls && pwd
+
+      - name: NPM install
+        run: sudo chmod -R 777 api && cd ./api/package && npm install
+
+      - name: Publish package on NPM
+        run: cd ./api/package && npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

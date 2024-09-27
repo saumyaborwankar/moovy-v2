@@ -7,4 +7,5 @@ export const TAB_NAMES = {
   clients: "clients",
   verifyEmail: "verify",
   notes: "notes",
+  search: "search",
 };

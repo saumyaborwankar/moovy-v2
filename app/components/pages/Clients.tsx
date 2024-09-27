@@ -3,9 +3,14 @@ import { useAppSelector } from "@/app/redux/hooks";
 import {
   useAddClientMutation,
   useDeleteClientMutation,
+  useUpdateClientMutation,
 } from "@/app/redux/slice/clientApi";
 import { Client } from "@/lib/db/schema";
-import { DeleteOutlined, FileTextOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  FileTextOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Form,
@@ -22,7 +27,7 @@ import {
 import { createSchemaFieldRule } from "antd-zod";
 import TextArea from "antd/es/input/TextArea";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import z from "zod";
 import { LoadingState } from "../atoms/LoadingState";
@@ -33,8 +38,8 @@ import Link from "next/link";
 export default function Clients({ clients }: { clients: Client[] }) {
   const router = useRouter();
   const [newClient, setNewClient] = useState<boolean>(false);
-  const userId = useAppSelector((state) => state.user.userId);
-
+  const userId = useAppSelector((state) => state.user.id);
+  const [edit, setEdit] = useState<DataType>();
   const [
     triggerAddNewClient,
     {
@@ -45,6 +50,15 @@ export default function Clients({ clients }: { clients: Client[] }) {
       error,
     },
   ] = useAddClientMutation();
+  const [
+    triggerUpdateClient,
+    {
+      data: updateClient,
+      isSuccess: updateClientSuccess,
+      isLoading: updateClientLoading,
+      isError: updateClientError,
+    },
+  ] = useUpdateClientMutation();
 
   const [triggerDeleteClient, { isSuccess, isError }] =
     useDeleteClientMutation();
@@ -52,6 +66,7 @@ export default function Clients({ clients }: { clients: Client[] }) {
   useEffect(() => {
     if (isSuccess) {
       message.success("Client deleted successfully.");
+      router.refresh();
     }
     if (isError) {
       message.error("Error in deleting client.");
@@ -74,6 +89,23 @@ export default function Clients({ clients }: { clients: Client[] }) {
     }
   }, [addClientError, addClientSuccess]);
 
+  useEffect(() => {
+    if (updateClientSuccess) {
+      setNewClient(false);
+      setEdit(undefined);
+      message.success("Client updated successfully.");
+      // router.push(`/${TAB_NAMES.dashboard}/${TAB_NAMES.clients}`);
+      router.refresh();
+    }
+    if (updateClientError) {
+      //@ts-ignore
+      const errorMsg = error?.data.error;
+      message.error(
+        errorMsg ? errorMsg : "Error in updating client. Try again later."
+      );
+    }
+  }, [updateClientError, updateClientSuccess]);
+
   interface formDetail {
     firstName: string;
     lastName: string;
@@ -87,6 +119,8 @@ export default function Clients({ clients }: { clients: Client[] }) {
     name: string;
     age: number;
     dateAdded: Date;
+    email: string;
+    address: string;
     // tags: string[];
   }
   // Client name, date added, Next Appointment, Appointments, Actions,
@@ -138,14 +172,22 @@ export default function Clients({ clients }: { clients: Client[] }) {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <Tooltip title={"Notes"}>
-            <Button icon={<FileTextOutlined />} />
+          {/* <Tooltip title={"Notes"}>
+            <Button type="link" icon={<FileTextOutlined />} />
+          </Tooltip> */}
+          <Tooltip title="Edit client details">
+            <Button
+              type="link"
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record)}
+            />
           </Tooltip>
+
           <Popconfirm
             title="Are you sure you want to delete this client?"
             onConfirm={() => triggerDeleteClient({ userId, id: record.key })}
           >
-            <Button danger icon={<DeleteOutlined />} />
+            <Button type="link" danger icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
       ),
@@ -153,23 +195,24 @@ export default function Clients({ clients }: { clients: Client[] }) {
   ];
 
   const data: DataType[] = clients.map((c, id) => {
-    // console.log(c.createdAt.);
     return {
-      key: c.id.toString(),
+      key: c.id,
       name: c.firstName + " " + c.lastName,
       age: c.age,
       dateAdded: c.createdAt!,
       tags: ["nice"],
+      email: c.email,
+      address: c.address!,
     };
   });
 
   const rowSelection = {
     onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
+      // console.log(
+      //   `selectedRowKeys: ${selectedRowKeys}`,
+      //   "selectedRows: ",
+      //   selectedRows
+      // );
     },
     getCheckboxProps: (record: DataType) => ({
       disabled: record.name === "Disabled User", // Column configuration not to be checked
@@ -179,13 +222,21 @@ export default function Clients({ clients }: { clients: Client[] }) {
   const NewClientValidation = z.object({
     firstName: z.string(),
     LastName: z.string(),
-    age: z.number(),
+    age: z.number().default(25),
     email: z.string().email({ message: "Email not valid" }),
   });
   const rule = createSchemaFieldRule(NewClientValidation);
 
+  async function handleUpdateClient(data: formDetail) {
+    triggerUpdateClient({
+      ...data,
+      id: edit?.key!,
+      userId,
+    });
+  }
   async function handleNewClient(data: formDetail) {
     data.userId = userId;
+    data.age = data.age ? data.age : 25;
     // const res = await addClient({
     //   ...data,
     //   id: generateId(15),
@@ -194,7 +245,26 @@ export default function Clients({ clients }: { clients: Client[] }) {
     // });
     triggerAddNewClient(data);
   }
+  const handleEdit = (record: DataType) => {
+    // console.log("Edit", record);
+    // setNewClient(true);
+    setEdit(record);
+  };
 
+  const [form] = Form.useForm();
+  useEffect(() => {
+    if (edit) {
+      // console.log(edit);
+      form.setFieldsValue({
+        firstName: edit.name.split(" ")[0],
+        lastName: edit.name.split(" ")[1],
+        email: edit.email,
+        age: edit.age,
+        address: edit?.address,
+      });
+      setNewClient(true);
+    }
+  }, [edit]);
   return (
     <>
       <Modal
@@ -205,8 +275,10 @@ export default function Clients({ clients }: { clients: Client[] }) {
         // style={{ minWidth: "30vw" }}
       >
         <Form
+          form={form}
+          key={new Date().toDateString()}
           layout="vertical"
-          onFinish={handleNewClient}
+          onFinish={edit ? handleUpdateClient : handleNewClient}
           style={{ width: "100%" }}
         >
           <div className="flex justify-between">
@@ -273,8 +345,12 @@ export default function Clients({ clients }: { clients: Client[] }) {
             />
           </Form.Item>
           <Form.Item style={{ textAlign: "right" }}>
-            <Button type="primary" htmlType="submit" loading={addClientLoading}>
-              Add Client
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={addClientLoading || updateClientLoading}
+            >
+              {edit ? "Update" : "Add Client"}
             </Button>
           </Form.Item>
           {/* <div
@@ -314,7 +390,16 @@ export default function Clients({ clients }: { clients: Client[] }) {
               type="primary"
               style={{ color: "white" }}
               icon={<FiPlus />}
-              onClick={() => setNewClient(true)}
+              onClick={() => {
+                form.setFieldsValue({
+                  firstName: "",
+                  lastName: "",
+                  email: "",
+                  age: 25,
+                  address: "",
+                });
+                setNewClient(true);
+              }}
             >
               Add Client
             </Button>

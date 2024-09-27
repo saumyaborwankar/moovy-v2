@@ -22,6 +22,7 @@ import { PRIMARY_COLOR } from "./atoms/constants";
 import { FaFacebookF } from "react-icons/fa";
 import { FaGoogle } from "react-icons/fa";
 import { useGetProductByNameQuery } from "../redux/slice/api";
+import TheraGift from "../../theragif.gif";
 interface formDetail {
   email: string;
   password: string;
@@ -120,42 +121,42 @@ export function LoginForm() {
 
   const LoginForm = () => {
     return (
-      <div className="h-full w-full mt-10 overflow-hidden">
-        {contextHolder}
-        <Image
-          alt="thera notes full logo"
-          src={screens.lg && screens.md ? TheraNotesFullLogo : TheraNotesLogo}
-          className={
-            screens.lg && screens.md
-              ? "w-[150px] h-[75px] mr-auto ml-auto mt-5 pt-5"
-              : "w-[70px] h-[75px] mr-auto ml-auto mt-5 pt-5"
-          }
-        ></Image>
-        <h2 className="text-center py-4 text-3xl text-black font-bold">
-          Welcome back
-        </h2>
-        <div className="text-slate-500 w-1/2 m-auto text-center mb-5">
-          Streamline Your Notes: Save Time, Improve Care, and Stay Organized
-        </div>
+      <div className="h-full w-full overflow-hidden flex flex-col justify-center">
+        <div>
+          <Image
+            alt="thera notes full logo"
+            src={screens.lg && screens.md ? TheraNotesFullLogo : TheraNotesLogo}
+            className={
+              screens.lg && screens.md
+                ? "w-[150px] h-[75px] mr-auto ml-auto mt-5 pt-5"
+                : "w-[70px] h-[75px] mr-auto ml-auto mt-5 pt-5"
+            }
+          ></Image>
+          <h2 className="text-center py-4 text-3xl text-black font-bold">
+            Welcome back
+          </h2>
+          <div className="text-slate-500 w-1/2 m-auto text-center mb-5">
+            Streamline Your Notes: Save Time, Improve Care, and Stay Organized
+          </div>
 
-        <div className="w-1/2 m-auto">
-          {screens.xs || !screens.md || !screens.xl || !screens.xxl ? (
-            <div className="flex-col justify-between w-full mb-5">
-              {GoogleButton()}
-              <div className="h-2"> </div>
-              {FacebookeButton()}
-            </div>
-          ) : (
-            <div className="flex justify-between w-full mb-5">
-              {GoogleButton()}
-              <div className="w-6"> </div>
-              {FacebookeButton()}
-            </div>
-          )}
+          <div className="w-1/2 m-auto">
+            {screens.xs || !screens.md || !screens.xl || !screens.xxl ? (
+              <div className="flex-col justify-between w-full mb-5">
+                {GoogleButton()}
+                <div className="h-2"> </div>
+                {FacebookeButton()}
+              </div>
+            ) : (
+              <div className="flex justify-between w-full mb-5">
+                {GoogleButton()}
+                <div className="w-6"> </div>
+                {FacebookeButton()}
+              </div>
+            )}
 
-          <DividerWithText />
+            {/* <DividerWithText /> */}
 
-          <Form
+            {/* <Form
             layout="vertical"
             onFinish={handleLogin}
             style={{ width: "100%" }}
@@ -207,30 +208,37 @@ export function LoginForm() {
                 </Button>
               </Form.Item>
             </div>
-          </Form>
-          <div>
-            <p className="text-black text-center">
-              Not registered yet?{" "}
-              <Link href="/sign-up">
-                <u>Register now</u>
-              </Link>
-            </p>
+          </Form> */}
+            <div>
+              <p className="text-black text-center">
+                Not registered yet?{" "}
+                <Link href="/sign-up">
+                  <u>Register now</u>
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
       </div>
     );
   };
 
-  return screens.lg ? (
-    <div className="flex h-screen overflow-hidden">
-      <Image
-        src={BackgroundImage}
-        className="w-1/2 "
-        alt="background image"
-      ></Image>
-      <LoginForm />
-    </div>
-  ) : (
-    <LoginForm />
+  return (
+    <>
+      {contextHolder}
+      {screens.lg ? (
+        <div className="flex h-screen overflow-hidden my-*">
+          <Image
+            src={BackgroundImage}
+            className="w-1/2"
+            alt="background image"
+          ></Image>
+
+          <LoginForm />
+        </div>
+      ) : (
+        <LoginForm />
+      )}
+    </>
   );
 }

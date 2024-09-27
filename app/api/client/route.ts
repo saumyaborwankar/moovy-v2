@@ -50,7 +50,12 @@ export const DELETE = async (req: Request) => {
     if (!clientExist) {
       return Response.json({ error: "Client not found." }, { status: 500 });
     }
-    await db.delete(clientTable).where(eq(clientTable.id, clientDetails.id));
+    // await db.delete(clientTable).where(eq(clientTable.id, clientDetails.id));
+    await db
+      .update(clientTable)
+      .set({ isDeleted: true })
+      .where(eq(clientTable.id, clientDetails.id));
+
     return Response.json({ success: true }, { status: 200 });
   } catch (e) {
     console.log(e);
@@ -72,7 +77,8 @@ export const GET = async (
       with: {
         notes: true,
       },
-      where: eq(clientTable.id, params.clientId),
+      where:
+        eq(clientTable.id, params.clientId) && eq(clientTable.isDeleted, false),
     });
     if (!clientExist) {
       return Response.json({ error: "Client not found." }, { status: 500 });
@@ -81,5 +87,34 @@ export const GET = async (
   } catch (e) {
     console.log(e);
     return Response.json({ error: "This client does not exist" });
+  }
+};
+
+export const PUT = async (req: Request) => {
+  //update client details
+  try {
+    const clientDetails = await req.json();
+    const clientExist = await db.query.clientTable.findFirst({
+      where:
+        eq(clientTable.userId, clientDetails.userId) &&
+        eq(clientTable.id, clientDetails.id) &&
+        eq(clientTable.isDeleted, false),
+    });
+    if (!clientExist) {
+      return Response.json({ error: "Client not found." }, { status: 500 });
+    }
+    await db
+      .update(clientTable)
+      .set({
+        ...clientDetails,
+      })
+      .where(eq(clientTable.id, clientDetails.id));
+    return Response.json({ success: true }, { status: 200 });
+  } catch (e) {
+    console.log(e);
+    return Response.json(
+      { error: "Cannot update client. Please try again later" },
+      { status: 500 }
+    );
   }
 };

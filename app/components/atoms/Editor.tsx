@@ -120,7 +120,7 @@ export function NoteEditor({ client }: { client: Client }) {
     },
   ] = useDeleteNoteMutation();
 
-  const userId = useAppSelector((state) => state.user.userId);
+  const userId = useAppSelector((state) => state.user.id);
 
   useEffect(() => {
     if (newNote) {

@@ -1,33 +1,34 @@
-import { signOut } from "@/app/actions/auth.actions";
+import { getUser, signOut } from "@/app/actions/auth.actions";
 import { TAB_NAMES } from "@/app/components/atoms/tabNames";
 import AppLayout from "@/app/components/pages/AppLayout";
-import { setUserDetails } from "@/app/redux/slice/userSlice";
 import { validateRequest } from "@/lib/auth";
-import { Button } from "antd";
 import { redirect } from "next/navigation";
-// import { useDispatch } from "react-redux";
 
 export default async function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // const dispatch = useDispatch();
   const { user } = await validateRequest();
+  let userDetails;
+
   if (!user) {
     redirect(`/${TAB_NAMES.signIn}`);
   } else {
-    // dispatch(setUserDetails(user.id));
+    const userFetch = await getUser(user.id);
+    if (userFetch.success) {
+      userDetails = userFetch.data;
+    }
   }
   const handleSignOut = async () => {
     "use server";
     await signOut();
     // return redirect("/sign-in"); // Redirect after sign-out
   };
-  // const redirectt = () => {
-  //   "use server";
-  //   redirect("/client");
-  // };
+
+  if (!userDetails) {
+    redirect(`/${TAB_NAMES.signIn}`);
+  }
 
   return (
     // <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -37,6 +38,6 @@ export default async function DashboardLayout({
     //   </form> */}
     //   {children}
     // </main>
-    <AppLayout user={user}>{children}</AppLayout>
+    <AppLayout user={userDetails}>{children}</AppLayout>
   );
 }

@@ -40,10 +40,21 @@ export const clientApi = createApi({
         body: JSON.stringify(deleteClient),
       }),
     }),
+    updateClient: builder.mutation<any, UpdateClient>({
+      query: (updateClient) => ({
+        url: "client",
+        method: "PUT",
+        body: JSON.stringify(updateClient),
+      }),
+    }),
   }),
 });
 
-export const { useAddClientMutation, useDeleteClientMutation } = clientApi;
+export const {
+  useAddClientMutation,
+  useDeleteClientMutation,
+  useUpdateClientMutation,
+} = clientApi;
 
 interface ClientDetails {
   userId: string;
@@ -58,4 +69,8 @@ interface ClientDetails {
 interface QueryClient {
   id: string;
   userId: string;
+}
+
+interface UpdateClient extends ClientDetails {
+  id: string;
 }

@@ -51,7 +51,7 @@ const clientSlice = createSlice({
     setClients: (state, action: PayloadAction<Client[]>) => {
       state = action.payload;
     },
-    // setUserDetails: (state, action: PayloadAction<UserResponse>) => {
+    // setUserId: (state, action: PayloadAction<UserResponse>) => {
     //   state.email = action.payload.email;
     //   state.username = action.payload.username;
     //   state.firstName = action.payload.firstName;
